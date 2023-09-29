@@ -26,7 +26,7 @@
 
 /// *************Preconfiguration
 
-#define MAX_INI_COUNT (10)
+#define MAX_INI_COUNT (20)
 
 const bool time_list(PointType &x, PointType &y) {return (x.curvature < y.curvature);};
 
@@ -191,7 +191,8 @@ void ImuProcess::IMU_init(const MeasureGroup &meas, esekfom::esekf<state_ikfom, 
     N ++;
   }
   state_ikfom init_state = kf_state.get_x();
-  init_state.grav = S2(- mean_acc / mean_acc.norm() * G_m_s2);
+  // init_state.grav = S2(- mean_acc / mean_acc.norm() * G_m_s2);
+  init_state.grav = S2(V3D(0.0001, 0.0001, 0.0001));
   
   //state_inout.rot = Eye3d; // Exp(mean_acc.cross(V3D(0, 0, -1 / scale_gravity)));
   init_state.bg  = mean_gyr;
@@ -255,7 +256,7 @@ void ImuProcess::UndistortPcl(const MeasureGroup &meas, esekfom::esekf<state_ikf
 
     // fout_imu << setw(10) << head->header.stamp.toSec() - first_lidar_time << " " << angvel_avr.transpose() << " " << acc_avr.transpose() << endl;
 
-    acc_avr     = acc_avr * G_m_s2 / mean_acc.norm(); // - state_inout.ba;
+    // acc_avr     = acc_avr * G_m_s2 / mean_acc.norm(); // - state_inout.ba;
 
     if(head->header.stamp.toSec() < last_lidar_end_time_)
     {
@@ -354,7 +355,7 @@ void ImuProcess::Process(const MeasureGroup &meas,  esekfom::esekf<state_ikfom, 
     state_ikfom imu_state = kf_state.get_x();
     if (init_iter_num > MAX_INI_COUNT)
     {
-      cov_acc *= pow(G_m_s2 / mean_acc.norm(), 2);
+      // cov_acc *= pow(G_m_s2 / mean_acc.norm(), 2);
       imu_need_init_ = false;
 
       cov_acc = cov_acc_scale;
